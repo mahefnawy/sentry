@@ -20,7 +20,6 @@ import ApiMixin from '../mixins/apiMixin';
 import Button from '../components/buttons/button';
 import EmptyMessage from './settings/components/emptyMessage';
 import EnvironmentStore from '../stores/environmentStore';
-import IndicatorStore from '../stores/indicatorStore';
 import ListLink from '../components/listLink';
 import LoadingIndicator from '../components/loadingIndicator';
 import Panel from './settings/components/panel';
@@ -131,10 +130,18 @@ const ProjectEnvironments = createReactClass({
           isHidden: shouldHide,
         },
         success: e => {
-          IndicatorStore.addSuccess(t('Update successful'));
+          addSuccessMessage(
+            tct('Updated [environment]', {
+              environment: env.displayName,
+            })
+          );
         },
         error: err => {
-          IndicatorStore.addError(t('An error occurred'));
+          addSuccessMessage(
+            tct('Unable to update [environment]', {
+              environment: env.displayName,
+            })
+          );
         },
         complete: this.refetchAll,
       }
