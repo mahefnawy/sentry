@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {addErrorMessage} from '../actionCreators/indicator';
+import {addErrorMessage, addSuccessMessage} from '../actionCreators/indicator';
 import AsyncView from './asyncView';
 import Form from './settings/components/forms/form';
 import NarrowLayout from '../components/narrowLayout';
@@ -18,16 +18,27 @@ class AcceptProjectTransfer extends AsyncView {
     return t('Accept Project Transfer');
   }
 
-  onSubmit = formData => {
-    let {team} = formData;
+  handleSubmit = formData => {
+    let teamId = formData.team;
     this.api.request('/accept-transfer/', {
       method: 'POST',
       data: {
         data: this.props.location.query.data,
-        team,
+        team: teamId,
       },
       success: () => {
-        window.location.assign('/');
+        let orgSlug;
+        this.state.transferDetails.organizations.forEach(o => {
+          if (!orgSlug) {
+            o.teams.forEach(team => {
+              if (team.id === teamId) {
+                orgSlug = o.slug;
+              }
+            });
+          }
+        });
+        this.props.router.push(`/${orgSlug}`);
+        addSuccessMessage(t('Project successfully transferred'));
       },
       error: error => {
         addErrorMessage(t('Unable to transfer project.'));
@@ -64,7 +75,7 @@ class AcceptProjectTransfer extends AsyncView {
           })}
         </p>
         <Form
-          onSubmit={this.onSubmit}
+          onSubmit={this.handleSubmit}
           submitLabel={t('Transfer Project')}
           submitPriority="danger"
           initialData={{team: choices[0] && choices[0][0]}}

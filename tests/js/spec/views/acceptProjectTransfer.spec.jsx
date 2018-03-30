@@ -6,10 +6,13 @@ import AcceptProjectTransfer from 'app/views/acceptProjectTransfer';
 jest.mock('jquery');
 
 describe('AcceptProjectTransfer', function() {
+  let getMock;
+  let postMock;
+  let endpoint = '/accept-transfer/';
   beforeEach(function() {
     MockApiClient.clearMockResponses();
 
-    MockApiClient.addMockResponse({
+    getMock = MockApiClient.addMockResponse({
       url: '/accept-transfer/',
       method: 'GET',
       body: {
@@ -17,14 +20,46 @@ describe('AcceptProjectTransfer', function() {
         organizations: [TestStubs.Organization({teams: [TestStubs.Team()]})],
       },
     });
+
+    postMock = MockApiClient.addMockResponse({
+      url: '/accept-transfer/',
+      method: 'POST',
+      statusCode: 204,
+    });
   });
 
   it('renders', function() {
-    let wrapper = mount(
-      <AcceptProjectTransfer location={{}} />,
+    mount(
+      <AcceptProjectTransfer
+        location={{
+          pathame: 'endpoint',
+          query: {data: 'XYZ'},
+        }}
+      />,
       TestStubs.routerContext()
     );
 
-    expect(wrapper).toMatchSnapshot();
+    expect(getMock).toHaveBeenCalled();
+  });
+
+  it('submits', function() {
+    let wrapper = mount(
+      <AcceptProjectTransfer
+        location={{
+          pathame: 'endpoint',
+          query: {data: 'XYZ'},
+        }}
+      />,
+      TestStubs.routerContext()
+    );
+
+    wrapper.find('form').simulate('submit');
+
+    expect(postMock).toHaveBeenCalledWith(
+      endpoint,
+      expect.objectContaining({
+        method: 'POST',
+      })
+    );
   });
 });

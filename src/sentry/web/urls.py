@@ -351,7 +351,7 @@ urlpatterns += patterns(
     url(r'^api/[^0]+/', generic_react_page_view),
     url(r'^out/$', OutView.as_view()),
 
-    url(r'^accept-transfer/$', react_page_view),
+    url(r'^accept-transfer/$', react_page_view, name='sentry-accept-project-transfer'),
     url(r'^settings/', react_page_view),
 
     # Organizations
